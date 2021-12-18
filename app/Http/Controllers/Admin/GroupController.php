@@ -19,7 +19,7 @@ class GroupController extends Controller
     {
         Group::create($request->validated());
 
-        return redirect()->route('home')->with('status', 'Group was successfully created.');
+        return redirect()->route('welcome')->with('status', 'Group was successfully created.');
     }
 
     public function edit(Group $group)
@@ -31,13 +31,13 @@ class GroupController extends Controller
     {
         $group->update($request->validated());
 
-        return redirect()->route('home')->with('status', 'Checklist group ' . $group->name . ' was successfully updated.');
+        return redirect()->route('welcome')->with('status', 'Checklist group ' . $group->name . ' was successfully updated.');
     }
 
     public function destroy(Group $group)
     {
         $group->delete();
 
-        return redirect()->route('home')->with('status', $group->name . ' was successfully deleted.');
+        return redirect()->route('welcome')->with('status', $group->name . ' was successfully deleted.');
     }
 }

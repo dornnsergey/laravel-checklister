@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditChecklistRequest extends FormRequest
 {
@@ -24,7 +25,12 @@ class EditChecklistRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required'
+            'name' => [
+                'required',
+                Rule::unique('checklists')
+                    ->where('group_id', $this->group->id)
+                    ->ignore($this->checklist->id)
+            ]
         ];
     }
 }

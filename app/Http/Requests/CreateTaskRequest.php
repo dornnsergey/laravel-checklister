@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CreateChecklistRequest extends FormRequest
+class CreateTaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,8 @@ class CreateChecklistRequest extends FormRequest
         return [
             'name' => [
                 'required',
-                Rule::unique('checklists')
-                    ->where('group_id', $this->group->id)
+                Rule::unique('tasks')
+                    ->where('checklist_id', $this->checklist->id)
             ]
         ];
     }

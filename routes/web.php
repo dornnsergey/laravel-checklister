@@ -15,17 +15,19 @@ use Illuminate\Support\Facades\Route;
 */
 Auth::routes();
 
-Route::view('/', 'welcome');
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::permanentRedirect('/', 'login');
 
 Route::middleware('auth')->group(function () {
+    Route::get('welcome', [\App\Http\Controllers\PageController::class, 'welcome'])->name('welcome');
+    Route::get('consultation', [\App\Http\Controllers\PageController::class, 'consultation'])->name('consultation');
+    Route::get('checklists/{checklist}', [\App\Http\Controllers\User\ChecklistController::class, 'show'])->name('user.checklists.show');
+
     Route::middleware('is_admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('pages', \App\Http\Controllers\Admin\PageController::class);
+        Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->only(['edit', 'update']);
         Route::resource('groups', \App\Http\Controllers\Admin\GroupController::class)->except('index', 'show');
         Route::resource('groups.checklists', \App\Http\Controllers\Admin\ChecklistController::class);
         Route::resource('checklists.tasks', \App\Http\Controllers\Admin\TaskController::class);
-
+        Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
     });
 });
 
