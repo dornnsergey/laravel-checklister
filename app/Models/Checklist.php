@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,7 +14,8 @@ class Checklist extends Model
         'name',
         'group_id',
         'user_id',
-        'checklist_id'
+        'checklist_id',
+        'last_user_action_at'
     ];
 
     public function group()
@@ -28,13 +28,25 @@ class Checklist extends Model
         return $this->hasMany(Task::class);
     }
 
-    public function isNew($lastUserActionAt)
+    public function isNew()
     {
-        $this->setAttribute('is_new', !$this->group->is_new && Carbon::create($this->created_at)->greaterThan($lastUserActionAt));
+        $ids = Checklist::where('user_id', auth()->user()->id)->pluck('checklist_id')->toArray();
+        $value = ! in_array($this->id, $ids);
+
+        $this->setAttribute('is_new', $value);
     }
 
-    public function isUpdated($lastUserActionAt)
+    public function isUpdated()
     {
-        $this->setAttribute('is_updated', !$this->group->is_new && !$this->is_new && Carbon::create($this->updated_at)->greaterThan($lastUserActionAt));
+        $isNew = $this->is_new;
+        $updated = $this->updated_at->greaterThan($this->lastUserActionAt());
+        $value = !$isNew && $updated;
+
+        $this->setAttribute('is_updated', $value);
+    }
+
+    public function lastUserActionAt()
+    {
+        return Checklist::where('user_id', auth()->user()->id)->where('checklist_id', $this->id)->value('last_user_action_at') ?? now()->subYears(10);
     }
 }

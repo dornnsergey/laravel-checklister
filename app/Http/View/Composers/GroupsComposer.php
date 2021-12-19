@@ -16,23 +16,12 @@ class GroupsComposer
             ->when(!auth()->user()->is_admin, fn($query) => $query->has('checklists'))
             ->get();
 
-
-        $lastUserActionAt = auth()->user()->last_action_at;
-        if (is_null($lastUserActionAt)) {
-            $lastUserActionAt = now()->subYears(10);
+        if (!auth()->user()->is_admin) {
+            $groups->map(function ($group) {
+                $group->isNew();
+                $group->isUpdated();
+            })->all();
         }
-
-        $groups->map(function ($group) use ($lastUserActionAt) {
-            $group->isNew($lastUserActionAt);
-            $group->isUpdated($lastUserActionAt);
-            $group->checklists->map(function ($checklist) use ($lastUserActionAt) {
-                $checklist->isNew($lastUserActionAt);
-                $checklist->isUpdated($lastUserActionAt);
-            });
-            })
-            ->all();
-        // dd($userGroups);
-
 
         $view->with('groups', $groups);
     }
